@@ -1,0 +1,196 @@
+﻿
+
+API full form is an Application Programming Interface that is a collection of communication protocols 
+and subroutines used by various programs to communicate between them.
+
+API helps two programs or applications to communicate with each other by providing them 
+with the necessary tools and functions. It takes the request from the user and sends it 
+to the service provider and then again sends the result generated from the service provider 
+to the desired user.
+
+ We can create an API for an operating system , database system , hardware system, JavaScript file ,
+ or similar object-oriented files.
+
+
+How do APIs Work?
+--> The client initiates the requests via the APIs URI (Uniform Resource Identifier)
+--> The API makes a call to the server after receiving the request
+--> Then the server sends the response back to the API with the information
+--> Finally, the API transfers the data to the client
+
+------------------------------------------------
+
+Types of APIs:
+APIs can be categorized based on their architecture(design) and usage.
+
+1. Web APIs
+Web APIs allow applications to communicate over the internet using HTTP.
+Commonly used for web and mobile applications.
+
+Examples:
+1. RESTful APIs (e.g., Twitter API)
+2. GraphQL APIs (e.g., GitHub API)
+3. SOAP APIs (e.g., Banking APIs)
+4. gRPC APIs (e.g., Microservices)
+
+
+
+APIs can be categorized based on who can access them and how they are used in web application:
+
+1. Public APIs (Open APIs):
+Examples:
+--> Google Maps API → Allows developers to embed maps in websites.
+--> OpenWeather API → Provides weather data.
+--> Twitter API → Lets apps interact with Twitter.
+
+
+2. Partner APIs:Restricted access → Available only to business partners.
+Examples:
+--> Amazon Marketplace API → Used by vendors to list and manage products.
+--> PayPal API → Used by businesses to process payments
+
+3. Internal APIs
+4. Composite APIs
+
+----------------------------------------------------
+
+Apis can be tested by :
+
+1. Using Swagger (Built-in API Testing UI)
+
+2. Using Postman (Most Popular API Testing Tool)
+
+
+3. http File in ASP.NET Web API?
+A .http file is a simple text file used in ASP.NET Core Web API projects for making and 
+testing HTTP requests directly from Visual Studio.
+
+4. Using CURL (Command-Line API Testing):
+curl -X GET "https://localhost:5001/api/products" -H "Accept: application/json"
+
+
+=====================================================================
+
+
+What is a RESTful API? 🚀
+A RESTful API (Representational State Transfer API) is a web service that follows REST principles to 
+enable communication between clients (e.g., web apps, mobile apps) and servers over HTTP.
+
+📌 RESTful APIs are widely used in modern web applications, especially in ASP.NET Core Web APIs.
+
+🔹 Key Principles of RESTful APIs
+A RESTful API must follow these 6 principles:
+
+1️. Stateless → Each request must contain all the necessary information, and the server does not store 
+   client session data.
+
+2️. Client-Server Architecture → The client (frontend) and server (backend) are separate, allowing
+   independent development.
+
+3️. Cacheability → Responses should specify whether they are cacheable to improve performance.
+
+4️. Layered System → The API can have multiple layers (e.g., database, authentication, security) without
+   affecting the client.
+
+5️. Uniform Interface → The API must follow consistent resource naming and HTTP methods 
+   (like GET, POST, PUT, DELETE).
+
+6️. Code on Demand (Optional) → In some cases, the server can send executable code (e.g., JavaScript) to the client.
+
+
+
+Caching:
+
+
+Server-Side Caching
+✅ The cache is stored on the server to reduce database queries and improve response time.
+✅ Used in ASP.NET Core Web API to reduce load on the server.
+✅ Common types:
+
+In-Memory Caching → Stores data in RAM for fast access.
+Distributed Caching → Uses external cache storage like Redis.
+Response Caching → Caches entire HTTP responses.
+Output Caching → Stores processed HTML output for performance.
+
+📌 Example: In-Memory Caching in ASP.NET Core
+
+public class ProductService
+{
+    private readonly IMemoryCache _cache;
+    public ProductService(IMemoryCache cache)
+    {
+        _cache = cache;
+    }
+
+    public List<Product> GetProducts()
+    {
+        return _cache.GetOrCreate("products", entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+            return FetchProductsFromDatabase(); // Simulated DB call
+        });
+    }
+}
+
+
+Client-Side Caching
+✅ The cache is stored in the browser or the client app.
+✅ Reduces network calls by storing frequently used data.
+✅ Common types:
+
+Browser Caching → Stores API responses in the browser (e.g., using Cache-Control headers).
+Local Storage / Session Storage → Saves data in the browser storage.
+CDN Caching → Content Delivery Networks cache static assets (CSS, JS, images) closer to users.
+
+📌 Example: HTTP Response Caching in ASP.NET Core
+[HttpGet]
+[ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
+public IActionResult GetProducts()
+{
+    return Ok(products);
+}
+
+=======================================================================================================
+
+
+What is DNS (Domain Name System)?
+DNS (Domain Name System) is a hierarchical and decentralized naming system that translates domain 
+names (e.g., google.com) into IP addresses (e.g., 142.250.180.14). This translation is essential 
+because computers communicate using IP addresses, but humans prefer easy-to-remember domain names.
+
+How DNS Works (Step-by-Step)
+1. User enters a domain name in a browser (e.g., www.example.com).
+2. Browser checks cache to see if the IP is already stored.
+3. Query sent to DNS Resolver (ISP’s DNS server).
+4. Resolver queries the Root DNS Server.
+5. Root server directs the query to the TLD (Top-Level Domain) Server (e.g., .com TLD server).
+6. TLD server directs the query to the Authoritative DNS Server (e.g., example.com DNS server).
+7. Authoritative DNS server returns the IP address.
+8. Browser connects to the website using the IP.
+
+
+Feature				                  How DNS Helps APIs
+API Endpoint Resolution	:  Converts domain names (e.g., api.example.com) into IPs
+Load Balancing	:          Distributes API requests across multiple servers
+Caching	:Reduces           lookup time, making API calls faster
+Security :                 (CDNs) Protects APIs from DDoS and improves performance
+
+==================================================================================================
+
+
+HTTP Headers:
+HTTP headers provide additional information about the request or response. In API development, 
+headers are used for various purposes such as authentication, content negotiation, caching, 
+and more. Common headers include:
+
+Authorization: Provides credentials for authentication.
+Content-Type: Specifies the format of the data being sent (e.g., JSON, XML).
+Accept: Indicates the preferred response format accepted by the client.
+
+
+HTTP Parameters:
+Parameters help replace or filter requests or responses, allowing for more flexible interactions.
+
+URL Parameters: Shown in the URL to indicate resource identifiers or query constraints.
+Query Parameters: Used in the query string to add criteria or preferences to search queries.
+Body Parameters: Sent along with requests for resource creation or modification.

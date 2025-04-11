@@ -1,0 +1,12 @@
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\bin\Debug\net8.0\Domain.deps.json
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\bin\Debug\net8.0\Domain.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\bin\Debug\net8.0\Domain.pdb
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.AssemblyInfoInputs.cache
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.AssemblyInfo.cs
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.csproj.CoreCompileInputs.cache
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\refint\Domain.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.pdb
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\ref\Domain.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.sourcelink.json

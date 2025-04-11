@@ -1,0 +1,16 @@
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\bin\Debug\net8.0\Persistence.deps.json
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\bin\Debug\net8.0\Persistence.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\bin\Debug\net8.0\Persistence.pdb
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\bin\Debug\net8.0\Domain.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\bin\Debug\net8.0\Domain.pdb
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.csproj.AssemblyReference.cache
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.GeneratedMSBuildEditorConfig.editorconfig
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.AssemblyInfoInputs.cache
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.AssemblyInfo.cs
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.csproj.CoreCompileInputs.cache
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persiste.61C28332.Up2Date
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\refint\Persistence.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.pdb
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\ref\Persistence.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.sourcelink.json

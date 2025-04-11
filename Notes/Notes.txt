@@ -1,0 +1,466 @@
+﻿
+
+1. Microsoft.EntityFrameworkCore.SqlServer
+This package is the SQL Server provider for Entity Framework Core (EF Core). It allows EF Core to 
+interact with Microsoft SQL Server databases.
+
+🔹 What It Does:
+Enables EF Core to connect to SQL Server.
+
+Provides SQL Server-specific functionality (like IDENTITY columns).
+
+Translates LINQ queries into SQL Server-compatible SQL.
+
+Supports migrations and schema management for SQL Server.
+
+
+2. Microsoft.EntityFrameworkCore.Tools
+This package provides EF Core command-line tools for managing migrations and updating the database.
+
+🔹 What It Does:
+Allows you to run EF Core commands like:
+
+
+
+----------------------------------------------------------------------------
+
+
+Microsoft.EntityFrameworkCore.Tools is Installed in the projcet that contains Connection String :
+
+builder.Services.AddDbContext<ApplicationDbContext>(Options =>
+{
+//Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"));
+Options.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings")["DefaultConnectionString"]);
+
+});
+
+----------------------------------------------------------------------------
+
+The Migrations is Saved in Infrastructre\Persistence
+
+in the Package Manager Console : Infrastructre\Persistence
+
+
+
+---------------------------------------------------------------------
+
+
+Project Refernces :
+
+{{ Core [F] }}:
+
+--> Domain does not references any projects
+
+--> Services Reference : { Domain , Services.Abstractions[to implement this Abstractions] }
+
+--> Services.Abstractions : { Shared : DTos}
+
+{{ Infrastructre [F] }}:
+
+--> Persistence Reference : {Domain [use Domains in Dbconetxt]}
+
+
+
+====================================================================================================
+
+
+Data Seeding:
+
+The DbInitializer class is used to:
+✅ Apply database migrations (update the database structure).
+✅ Insert initial data (seed data like product types, brands, etc.).
+✅ Ensure the database is ready before the API starts handling requests.
+
+In Program.cs:
+
+//This method InitializeDbAsync is a helper function that initializes the database
+async Task InitializeDbAsync(WebApplication app)
+{
+
+using var scope = app.Services.CreateScope();
+
+//This allows retrieving services like IDbInitializer that are registered in dependency injection (DI).
+
+var DbInitializer =scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+
+//Gets an instance of IDbInitializer
+
+await DbInitializer.InitializeAsync();  
+
+}
+
+================================================================================
+
+
+ConcurrentDictionary<TKey, TValue> is a thread-safe dictionary in C# that allows multiple threads to read 
+and write simultaneously without requiring explicit locks.
+
+✅ Atomic Operations – Methods like TryAdd, TryUpdate, and TryRemove ensure safe modifications.
+✅ Prevents Data Corruption – No race conditions when multiple threads modify the dictionary.
+
+sing GetOrAdd and AddOrUpdate
+These methods ensure safe insertion and updates.
+
+Get or Add a Value
+If the key exists, it returns the existing value.
+If the key does not exist, it adds the value.
+
+
+----------------------------------------------------------------------------
+
+
+--> Dtos will be in Shared Project .
+
+ It's better to use record for DTOs because:
+
+✔️ Value equality – Two DTOs with the same data are considered equal, making comparisons easier.
+✔️ Immutable by default – Helps prevent accidental modification of DTOs, making them safer.
+
+🏆 When Should You Use record for DTOs?
+✔️ If DTOs are immutable (read-only data transfer) ✅
+✔️ If you need to compare DTOs by value (e.g., caching, deduplication) ✅
+✔️ If you want cleaner, more maintainable code ✅
+
+
+====================================================================
+
+
+🔹 What is a Primary Constructor in C#?
+A primary constructor in C# is a new feature in C# 12 that allows defining constructor parameters directly
+in the class or struct declaration, reducing boilerplate code.It’s mainly used for data-centric 
+types, such as DTOs, configuration objects, and lightweight models.
+
+---> public class Person(string Name, int Age); // Primary Constructor
+
+
+==========================================================================
+
+AutoMapper is a library in .NET that simplifies object-to-object mapping, eliminating the need for 
+manual property assignments.
+
+🔹 Why use AutoMapper?
+✔️ Reduces boilerplate code when mapping between objects (e.g., DTOs to Entities).
+✔️ Ensures consistency in mapping logic across an application.
+✔️ Supports custom mappings and transformations.
+
+using AutoMapper;
+
+public class UserProfile : Profile
+{
+    public UserProfile()
+    {
+        CreateMap<User, UserDto>(); // Mapping User → UserDto
+    }
+}
+
+builder.Services.AddAutoMapper(typeof(Program)); // Register AutoMapper
+
+
+in The services:
+
+public class UserService
+{
+    private readonly IMapper _mapper;
+
+}
+
+----------------------------------------------------------------------
+
+🔹 What is the Service Manager Class in C#?
+The Service Manager class is a centralized service container that manages multiple services in an application. 
+It acts as a wrapper around different services, making them easily accessible.
+
+💡 Think of it as a "facade" that provides a single entry point to multiple services.
+
+🔹 Why Use a Service Manager?
+✅ Simplifies Dependency Injection – Reduces constructor clutter.
+✅ Improves Maintainability – Centralized service management.
+✅ Encapsulates Service Logic – Avoids direct access to repositories.
+✅ Enhances Testability – Makes it easier to mock dependencies
+
+public interface IServiceManager
+{
+    IProductService ProductService { get; }
+    IOrderService OrderService { get; }
+}
+
+🔹 How to Optimize ServiceManager When Not All Services Are Needed?
+If you don't always need both ProductService and OrderService at the same time, you can lazy load 
+them or use factory-based dependency injection to improve performance and avoid unnecessary service instantiation.
+
+Lazy Initialization with Lazy<T>
+🔹 Delays the creation of services until they are actually accessed.
+🔹 Improves performance by not resolving dependencies unless needed.
+
+
+public class ServiceManager : IServiceManager
+{
+    private readonly Lazy<IProductService> _productService;
+    private readonly Lazy<IOrderService> _orderService;
+
+    public ServiceManager(Lazy<IProductService> productService, Lazy<IOrderService> orderService)
+    {
+        _productService = productService;
+        _orderService = orderService;
+    }
+
+    public IProductService ProductService => _productService.Value;
+    public IOrderService OrderService => _orderService.Value;
+}
+
+===================================================================================
+
+In controllers :
+
+Key Differences:
+
+Return Type:
+--> Task<ActionResult<IEnumerable<ProductResultDto>>> is more specific about the type of data returned 
+    (an IEnumerable<ProductResultDto>).
+
+--> Task<IActionResult> is more generic and doesn't specify the data type that will be returned.
+
+Type Safety:
+
+With ActionResult<T>, the return type is strongly typed, meaning it’s clear that the action will 
+return a collection of ProductResultDto objects, making it easier to understand and work with the returned data.
+
+With IActionResult, the return type is not strongly typed, so it’s less explicit about what 
+data is being returned, which can be useful in situations where you want to return different 
+types of responses (e.g., error messages or various status codes) but don't need a specific type.
+
+When to Use Each:
+
+Use ActionResult<T> (e.g., ActionResult<IEnumerable<ProductResultDto>>) when you want explicit typing 
+for your response and want to handle data alongside status codes.
+
+Use IActionResult when you want flexibility and don't need to specify a particular type of data in 
+the return. It’s useful when the action might return different types of responses (e.g., error results
+, success results with different data types, etc.).
+
+===============================================================================
+
+
+variables related to the environment (such as connection strings, API keys, feature flags, and 
+other configuration settings) should be stored in configuration files or environment variables 
+rather than hardcoded in the application. 
+
+-->The appsettings.json file is the most common place to store environment-related variables 
+    like database connection strings, API keys, and other settings.
+
+Example:
+
+private readonly IConfiguration _configuration; --> Install Microsoft.Extensions.Configuration
+var googleMapsApiKey = _configuration["ApiKeys:GoogleMaps"];
+
+IConfiguration → Read configuration settings (from JSON, env vars, etc.) ✅
+IConfigurationManager → Modify/add configuration at runtime (introduced in .NET 6) 🔄
+
+
+---------------------------------------------------------------------------------------
+
+
+app.UseStaticFiles();, ASP.NET automatically maps wwwroot to the base URL.
+Anything inside wwwroot is accessible directly via https://your-api.com/.
+
+----------------------------------------------------------------------------------
+
+
+Linq , EF core Notes:
+
+context.Set<Department>().Where(d => d.Id > 33);
+
+You’re actually passing a lambda that is treated as an Expression<Func<T, bool>>, not a Func<T, bool> —
+because context.Set<Department>() returns an IQueryable<Department>, not IEnumerable<Department>.
+
+
+--> When used with IQueryable, C# interprets the lambda as an expression tree, i.e.,:
+--> Whereas with IEnumerable, the lambda is treated as a delegate, i.e.,:
+
+	Func<T, bool>	                     Expression<Func<T, bool>>
+	IEnumerable<T> (in-memory)	       IQueryable<T> (EF Core, DB query)
+	In memory (C# runtime)	           In the database (via SQL)
+	❌ Slower (loads all data first)   ✅ Faster (filters in SQL at DB level)
+
+
+Exmaple:
+
+ Expression<Func<Department, bool>> filterExpr = e => e.Id > 33;
+            Func<Department, bool> exp = e => e.Id > 33;
+
+//var result = context.Set<Department>().Where(filterExpr).ToList();:
+SELECT [d].[Id], [d].[Name]
+FROM [Department] AS [d]
+WHERE [d].[Id] > 33
+
+
+//var result2 = context.Set<Department>().Where(exp).ToList();
+:SELECT [d].[Id], [d].[Name]
+FROM [Department] AS [d]
+
+
+----------------------------------------------------------------------------------------
+
+Specification Design Pattern:
+
+🎯 What is it?
+The Specification Pattern is a way to encapsulate business rules (like filters or conditions) into reusable, 
+composable objects.Instead of writing a lot of if statements everywhere, you create small classes that represent
+a condition (specification), and then combine them when needed.
+
+
+🧠 Imagine this:
+You have a list of products, and you want to filter:
+Only the ones that are green
+And the ones that are cheap
+Or maybe both!
+
+Without specification pattern, you'd write a lot of if-else checks.
+
+With specification pattern, you do this:
+
+var greenSpec = new ColorSpecification("green");
+var cheapSpec = new PriceSpecification(maxPrice: 100);
+
+var cheapAndGreen = new AndSpecification<Product>(greenSpec, cheapSpec);
+
+var result = products.Where(p => cheapAndGreen.IsSatisfiedBy(p));
+
+
+--------------------------------------------------------------------------------------
+
+Sorting and Filtering:
+
+
+In specifications class:
+
+public abstract class Specifications<T> where T : class
+{
+
+//The filtering condition (like WHERE)
+public Expression<Func<T, bool>>? Criteria { get; }
+
+// 3. Order By
+public Expression<Func<T, object>>? OrderBy { get; private set; }
+
+//4.Order By Descending
+public Expression<Func<T, object>>? OrderByDescending { get; private set; }
+
+}
+
+In Product Specifiactions class:
+ public ProductWithTypeAndBrandSpecifications(string? sort, int? BrandId, int? TypeId) : base(
+
+    Product =>
+    (!BrandId.HasValue || BrandId.Value == Product.BrandId) &&
+    (!TypeId.HasValue || TypeId.Value == Product.TypeId)
+
+    )
+    {
+
+    AddInclude(Product => Product.ProductBrand);
+    AddInclude(Product => Product.ProductType);
+
+
+
+    if (!string.IsNullOrWhiteSpace(sort))
+    {
+
+    switch (sort.ToLower().Trim())
+    {
+
+
+        case "pricedesc":
+            SetOrderByDescending(Product => Product.Price);
+            break;
+
+    }
+
+}
+
+
+In Controller:
+
+
+[HttpGet("Products")]
+public async Task<ActionResult<IEnumerable<ProductResultDto>>> GetAllProducts(string? sort, int? BrandId, int? TypeId)
+{
+var Products = await _serviceManager.ProductService.GetAllProductsAsync(sort, BrandId, TypeId);
+}
+
+-----------------------------------------------
+
+for Improvement (Optional)
+1. 📦 Wrap filters in a ProductQueryParameters DTO (cleaner + scalable)
+Instead of:
+(string? sort, int? BrandId, int? TypeId)
+
+Create:
+In Shared Project
+public class ProductQueryParameters
+{
+    public string? Sort { get; set; }
+    public int? BrandId { get; set; }
+    public int? TypeId { get; set; }
+    public int? PageNumber { get; set; } // optional for future paging
+    public int? PageSize { get; set; }
+}
+
+======================================================
+
+How Enum Binding Works in ASP.NET Core:
+If your query string parameter is passed as a string (e.g., "PriceDesc") and you define Sort as an enum like 
+ProductSortOptions in your ProductQueryParameters, ASP.NET Core will automatically bind the query string value 
+to the enum.
+
+Here's how it works:
+
+1. When you make a request like /api/products?sort=PriceDesc, the query parameter sort=PriceDesc is passed to 
+   the ProductQueryParameters class.
+
+2. ASP.NET Core will automatically attempt to parse the string "PriceDesc" to the corresponding enum value 
+    ProductSortOptions.PriceDesc.
+
+3. After the parsing, the enum value ProductSortOptions.PriceDesc will be available in Parameters.Sort in the controller.
+
+4. This enum value is passed into your ProductWithTypeAndBrandSpecifications constructor, and the appropriate 
+    sorting logic will be applied based on that enum value.
+
+Errors:
+The error response is from ASP.NET Core's Model Validation system, which automatically 
+validates model binding when it cannot bind the incoming query string (or any other model data) to the expected types.
+
+"type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+"title": "One or more validation errors occurred.",
+"status": 400,
+"errors": {
+    "Sort": [
+        "The value '44' is invalid."
+    ]
+},
+"traceId": "00-e336d7f37f18cf7c9c88848a71848727-2c78393611e3e27a-00
+
+------------------------------------------------------------------------------------------------------
+
+
+Pagination:
+
+In Product QueryParamters:
+
+public int PageIndex { get; set; } = 1; 
+private const int MaxPageSize = 10;
+public const int DefaultPageSize = 5;
+private int _PageSize = DefaultPageSize;
+
+
+public int PageSize
+{
+get { return _PageSize; }
+
+
+set { _PageSize = value > MaxPageSize ? DefaultPageSize : value; }
+
+}
+
+--> paginated Result:
+

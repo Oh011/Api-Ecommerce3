@@ -1,0 +1,67 @@
+﻿
+
+
+Onion Architecture in ASP.NET Core Web API 
+
+🔹 What is Onion Architecture?
+Onion Architecture is a software design pattern(Software architecture) that promotes loose coupling, 
+separation of concerns,and scalability in ASP.NET Core applications. It helps create 
+maintainable and testable applications by organizing the code into layers, where dependencies 
+only point inward (toward the core).
+
+🔹 Why Use Onion Architecture?
+✅ Better Maintainability – Each layer has a clear responsibility.
+✅ Loose Coupling – Business logic is independent of frameworks and external dependencies.
+✅ Testability – Core logic can be tested without dependencies like databases.
+✅ Scalability – The structure supports large projects.
+
+
+🔹 Dependency Flow in Onion Architecture
+🟢 Domain Layer (Core) ⬇
+🟡 Application Layer (Service Layer) ⬇
+🟠 Infrastructure Layer (Database, API Calls) ⬇
+🔵 Presentation Layer (ASP.NET API Controllers)
+
+📌 The key rule → Higher layers depend on lower layers, but lower layers never depend on higher layers.
+
+1. Domain Layer (Core Business Logic)
+✅ Contains business logic, domain entities, and interfaces.
+✅ Does not depend on any other layer.
+✅ Independent of frameworks (like ASP.NET, EF Core).
+
+1. Entities
+2. Repository interfaces
+
+Exmaple:
+public class Product
+{
+
+}
+public interface IProductRepository --> Contracts
+{
+    Task<IEnumerable<Product>> GetAllProducts();
+    Task<Product> GetProductById(int id);
+    Task AddProduct(Product product);
+    Task UpdateProduct(Product product);
+    Task DeleteProduct(int id);
+}
+---------------------------------------------------------------------------
+
+🟡 2. Application Layer (Service Layer)
+✅ Implements business rules using domain entities.
+✅ Defines DTOs (Data Transfer Objects) and Service Interfaces. --> Define Dtos in {{Shared Project}}
+✅ Acts as a bridge between Domain and Infrastructure layers.
+
+The Service layer sits right above the Domain layer, which means that it has a reference to the Domain layer. 
+The Service layer is split into two projects, Services.Abstractions and Services.
+
+In the Services.Abstractions project you can find the definitions for the service interfaces that 
+are going to encapsulate the main business logic. Also, we are using the Contracts project
+to define the Data Transfer Objects (DTO) that we are going to consume with the service interfaces.
+
+--> Install AutoMapper in services Project
+
+Dependencies:
+
+Service Layer --> {Domain , Service.Abstractions}
+Service.Abstarctions --> {{Shared (Dtos)}}}
