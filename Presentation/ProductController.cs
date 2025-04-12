@@ -70,8 +70,14 @@ namespace Presentation
         {
 
 
-            var Product = await _serviceManager.ProductService.GetProductById(id);
 
+
+            if (!ModelState.IsValid)
+                Console.Write("yes");
+
+
+
+            var Product = await _serviceManager.ProductService.GetProductById(id);
 
             return Ok(Product);
         }
@@ -81,7 +87,7 @@ namespace Presentation
 
 
 //In ASP.NET Core Web API, ControllerBase is a base class for controllers that don't need to
-//return views (i.e., API controllers). It is used when you're building RESTful APIs.
+//return views (i.e., API controllers). It is used when you're building RESTFUl APIs.
 
 //ControllerBase provides several useful methods and properties for working with HTTP requests and responses,
 //such as:

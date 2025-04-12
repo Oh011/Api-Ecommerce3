@@ -1,4 +1,7 @@
 using Domain.Contracts;
+using E_Commerce.Factories;
+using E_Commerce.Middlewares;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 using Persistence.Data.DataSeeding;
@@ -54,6 +57,23 @@ namespace E_Commerce
 
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
+            //------------------------------------------------------------------
+
+            //The ApiBehaviorOptions class allows you to configure default behaviors for API controllers
+
+            //behavior of model validation and response generation when the model state is invalid
+
+            builder.Services.Configure<ApiBehaviorOptions>(
+
+                //Func ==> IActionResult
+                Options => Options.InvalidModelStateResponseFactory = ApiResponseFactory.CustomValidationsResponse
+
+            );
+
+            // changes the default behavior of how ASP.NET Core handles invalid model state 
+
+
+            //------------------------------------------------------------------------
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -96,6 +116,9 @@ namespace E_Commerce
             var app = builder.Build();
 
 
+            app.UseMiddleware<GlobalErrorHandlingMiddleware>(); // This will call InvokeAsync() in GlobalExceptionMiddleware
+            //ASP.NET Core framework itself calls the InvokeAsync() method for every middleware in the pipeline.
+
             await InitializeDbAsync(app);
 
             app.UseCors("AllowAll");
@@ -113,6 +136,8 @@ namespace E_Commerce
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
