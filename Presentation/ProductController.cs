@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Shared;
 using Shared.Dtos;
@@ -9,10 +9,9 @@ namespace Presentation
 {
 
 
-    [ApiController]
-    [Route("api/[controller]")]
     // This is not shown in swagger
-    public class ProductController(IServiceManager _serviceManager) : ControllerBase
+    [Authorize]
+    public class ProductController(IServiceManager _serviceManager) : ApiController
     {
 
 
@@ -66,6 +65,8 @@ namespace Presentation
 
         [HttpGet("{id}")]
 
+
+
         public async Task<ActionResult<ProductResultDto>> GetById(int id)
         {
 
@@ -117,3 +118,9 @@ namespace Presentation
 //[FromRoute] :  Route segments	GET /api/products/{id}
 //[FromBody]  :  Request body(JSON) POST / api / products with a JSON body
 //[FromForm]  :  Form data	For form submissions (e.g., file uploads)
+
+
+//[ProducesResponseType] tells the framework and tools like Swagger:
+//-->used for API documentation and response metadata
+//What kind of response a controller action might return.
+//The HTTP status code associated with each type of response.

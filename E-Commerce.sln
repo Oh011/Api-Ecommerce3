@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{8779A79A
 	ProjectSection(SolutionItems) = preProject
 		Notes\Apis.txt = Notes\Apis.txt
 		Notes\Notes.txt = Notes\Notes.txt
+		Security.txt = Security.txt
 		Notes\Software_Architecture.txt = Notes\Software_Architecture.txt
 	EndProjectSection
 EndProject

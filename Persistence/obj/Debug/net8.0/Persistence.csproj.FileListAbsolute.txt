@@ -14,3 +14,5 @@ C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj
 C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.pdb
 C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\ref\Persistence.dll
 C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\obj\Debug\net8.0\Persistence.sourcelink.json
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\bin\Debug\net8.0\Shared.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Persistence\bin\Debug\net8.0\Shared.pdb

@@ -5,5 +5,7 @@
 
 
         Task InitializeAsync();
+
+        Task InitializeIdentityAsync();
     }
 }

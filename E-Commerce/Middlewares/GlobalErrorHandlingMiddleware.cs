@@ -87,25 +87,41 @@ namespace E_Commerce.Middlewares
             //Set Content Type:
 
             context.Response.ContentType = "application/json";
-
-            context.Response.StatusCode = ex switch
-            {
-
-
-                NotFoundException => (int)HttpStatusCode.NotFound, //->// 404 for NotFoundException
-                _ => (int)HttpStatusCode.InternalServerError, //->This is a default case (denoted by _), which is a catch-all for any exception that doesn't match the NotFoundException case.
-            };
-
-
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
 
 
             var Response = new ErrorDetails()
             {
 
-                StatusCode = context.Response.StatusCode,
+
                 ErrorMessage = ex.Message
             };
+
+
+            context.Response.StatusCode = ex switch
+            {
+
+                //all have error message
+
+                NotFoundException => (int)HttpStatusCode.NotFound, //->// 404 for NotFoundException
+                UnauthorizedException => (int)HttpStatusCode.Unauthorized, //-->401 Unauthorized
+                ValidationException validationException => HandleValidationException(validationException, Response), //If validation Exception add :--> errors
+                _ => (int)HttpStatusCode.InternalServerError, //->This is a default case (denoted by _), which is a catch-all for any exception that doesn't match the NotFoundException case.
+            };
+
+
+
+            Response.StatusCode = context.Response.StatusCode;
+
+
+
+            //var Response = new ErrorDetails()
+            //{
+
+            //    StatusCode = context.Response.StatusCode,
+            //    ErrorMessage = ex.Message
+            //};
 
 
 
@@ -113,10 +129,23 @@ namespace E_Commerce.Middlewares
 
             await context.Response.WriteAsync(SerializedResponse);
         }
+
+        private int HandleValidationException(ValidationException ex, ErrorDetails response)
+        {
+            //Adds validation errors to the response body.
+
+
+
+            response.Errors = ex.Errors;
+
+            return (int)HttpStatusCode.BadRequest;
+
+        }
     }
 }
 
-//GlobalExceptionMiddleware handles all unhandled exceptions that occur downstream in the middleware pipeline — that includes:
+//GlobalExceptionMiddleware handles all unhandled exceptions that occur downstream in the middleware pipeline —
+//that includes:
 
 //NullReferenceException
 //InvalidOperationException

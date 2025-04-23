@@ -1,0 +1,318 @@
+﻿
+
+--> Migrations with Two DbConetexts:
+
+
+//How to Add a Migration for a Specific Context:
+
+//Add-Migration InitialIdentity -context IdentityAppDbContext -o Identity/Migrations
+
+//To Update :
+//Update-Database -context IdentityAppDbContext
+
+---------------------------------------------------------------------------
+
+Internals of Identity Package:
+
+UserStore and IUserStore are core parts of ASP.NET Identity — they’re the abstraction and implementation 
+responsible for how user data is saved and retrieved (e.g., from a database)
+
+?? What is IUserStore<TUser>?
+IUserStore<TUser> is an interface that defines how Identity interacts with a user store (like a database).
+
+some Functions:
+Task<IdentityResult> CreateAsync(TUser user);
+Task<TUser> FindByIdAsync(string userId);
+Task<TUser> FindByNameAsync(string userName);
+
+
+?? How do UserManager and RoleManager manage data without us writing a repository?
+
+?? What is UserStore<TUser>?
+UserStore<TUser> is the default implementation of IUserStore that works with Entity Framework Core.
+It knows how to store User objects in a relational database like SQL Server, using DbContext.
+
+
+?? Under the Hood
+UserManager<User> depends on:
+IUserStore<User>
+Plus interfaces like IUserPasswordStore, IUserEmailStore, etc.
+
+RoleManager<IdentityRole> depends on:
+IRoleStore<IdentityRole>
+
+services.AddIdentity<User, IdentityRole>(Options=>{
+
+//to add options :
+
+options.Password.RequireNonAlphanumeric = true;
+options.Password.RequireDigit = true;
+
+})
+.AddEntityFrameworkStores<IdentityAppDbContext>();
+It does:
+
+? Registers:
+
+UserManager<User>
+RoleManager<IdentityRole>
+IUserStore<User> ? UserStore<User>
+IRoleStore<IdentityRole> ? RoleStore<IdentityRole>
+
+
+2. options => { ... }
+This is where you configure Identity options, especially around security like password rules, lockouts, etc.
+options.User.RequireUniqueEmail = true;
+options.Password.RequiredLength = 8;
+options.Lockout.MaxFailedAccessAttempts = 5
+
+
+.AddEntityFrameworkStores<IdentityAppDbContext>()
+Tells Identity to use EF Core with your IdentityAppDbContext to store:
+Users ? in AspNetUsers
+Roles ? in AspNetRoles
+Claims, tokens, user logins, etc.
+
+:==> This uses the UserStore and RoleStore implementations under the hood.
+
+----------------------------------------------
+
+Identity Package :
+
+//AspNetUsers table is the default table used by ASP.NET Identity to store user accounts
+//Why the name AspNetUsers?
+//It's just a convention used by ASP.NET Identity (default table names are AspNetUsers, AspNetRoles, etc.).
+
+
+-------------------------------------------
+
+Data Seeding :
+
+--> in  Dbinitializer:
+public async Task InitializeIdentityAsync(){   
+//seed roles
+// seed users
+}
+
+
+-------------------------------------------------------
+
+//UserManger , Rolemanager
+
+---------------------------------------------------------
+
+//Authentication Service Notes :
+
+
+Login Logic:
+
+// 1. Find the user by email or username
+var user = await _userManager.FindByEmailAsync(model.Email);
+if (user == null)
+{
+return Unauthorized(new { message = "Invalid email or password." }); --> If in { Controller }
+ throw new UnauthorizedException(); --> If in { Service }
+}
+
+//2.
+var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+if (!isPasswordValid)
+{
+return Unauthorized(new { message = "Invalid email or password." }); --> If in { Controller }
+ throw new UnauthorizedException(); --> If in { Service }
+
+}
+
+// 3. Generate a JWT token (or sign in with cookies, depending on your setup)
+var token = _tokenService.GenerateToken(user); // assume you have a service to create JWT
+
+
+:-->
+?? 401 Unauthorized
+This status means:
+“The request has not been applied because it lacks valid authentication credentials for the target resource.”
+
+------------------------
+
+--> Optional : Email is confirmed:
+
+What is "EmailConfirmed"?
+In ASP.NET Identity, every user has a property:
+public bool EmailConfirmed { get; set; }
+It's false by default when a new user registers.
+When you send them a confirmation email (with a link), and they click it — the system sets EmailConfirmed = true.
+
+Why Use This?
+Security: Prevent people from using fake or throwaway emails
+Trust: Ensure the user has access to the email they provided
+
+he Flow Usually Looks Like This:
+
+1. User registers
+
+2. App sends email with a confirmation link:
+https://yourapp.com/confirm-email?userId=abc&token=xyz
+
+3. User clicks the link
+
+Backend receives it and calls:
+await _userManager.ConfirmEmailAsync(user, token);
+EmailConfirmed is now true
+
+✅ Now they can log in
+
+============================================================================================
+
+
+JWT Token:
+
+
+A JSON Web Token (JWT) is a standard used to securely transmit information between a client 
+(like a frontend application) and a server (the backend). It is commonly used to verify users’ 
+identities, authenticate them, and ensure safe communication between the two.
+
+How JWT token Works?
+1.User Logs In: The client (browser) sends login credentials to the server.
+
+2.Server Generates JWT: If credentials are valid, the server creates a JWT containing user data and 
+signs it with a secret key.
+
+3.Token Sent to Client: The JWT is sent back to the client and stored (usually in localStorage or a cookie).
+
+4.Client Sends Token in Requests: For protected routes, the client includes the JWT in 
+the Authorization header (Bearer Token).
+
+5. Server Verifies and Responds: The server verifies the token, extracts user info, and 
+processes the request if valid.
+
+
+A JWT consists of three parts, separated by dots (.)
+Header. Payload. Signature
+
+Header: Contains metadata about the token, such as the algorithm used for signing. -->Base64Url Encoded Header
+
+Payload: Stores the claims, i.e., data being transmitted.
+Common claim types:
+iss (Issuer): Identifies who issued the token.
+sub (Subject): Represents the user or entity the token is about.
+aud (Audience): Specifies the intended recipient.
+exp (Expiration): Defines when the token expires.
+iat (Issued At): Timestamp when the token was created.
+nbf (Not Before): Specifies when the token becomes valid.
+
+Signature: Ensures the token’s integrity and authenticity.
+The signature ensures token integrity and is generated using the header, payload, and a secret key. 
+In this example we will use HS256 algorithm to implement the Signature part
+
+HMACSHA256(
+    base64UrlEncode(header) + "." + base64UrlEncode(payload),
+    secret)
+
+
+Jwt is :
+Stateless Authentication: No need to store user sessions on the server; JWT contains all necessary data.
+
+
+to use Install:
+--> Microsoft.AspNetCore.Authentication.Jwt
+
+What does JSON.parse(atob(payload)); do?
+atob(payload) decodes the Base64URL encoded string (which is the payload part of the JWT) 
+into a plain text string.
+
+
+-------------------------------
+
+//sending Token from frontend:
+Usually, it's sent in the HTTP Authorization header like this:
+Authorization: Bearer <your_token_here>
+
+const token = localStorage.getItem("token"); // or sessionStorage
+
+fetch("https://your-api.com/api/products", {
+  method: "GET",
+  headers: {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json"
+  }
+})
+
+-->Bearer is a type of authorization scheme.
+
+---------------------------------------------------------------------
+
+Jwt Options and configurations:
+Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+});
+
+AddAuthentication: This method is used to add authentication services to your application. 
+It configures how ASP.NET Core will handle authentication for incoming requests.
+
+
+1. options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;-->:
+
+{How to check if a user is logged in}
+This line sets the default authentication scheme to use JWT (JSON Web Tokens). The authentication scheme 
+tells the app what method or technology it should use to authenticate incoming requests.
+
+:JwtBearerDefaults.AuthenticationScheme is a built-in constant that represents the JWT Bearer 
+authentication scheme.
+
+When a request is received, the application will try to authenticate it using the JWT Bearer token 
+(which is usually sent in the Authorization header of the request).
+
+
+2.options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;-->:
+{How to respond to unauthenticated requets}
+This line sets the default challenge scheme to also use JWT Bearer. A "challenge" happens when the 
+app needs to ask the user to authenticate if they haven't already.
+
+For example, if the user sends a request without a token or with an invalid token, the app will send 
+a challenge response (usually a 401 Unauthorized status).
+
+JwtBearerDefaults.AuthenticationScheme:
+telling the application to always use JWT authentication for both authenticating users and 
+challenging them when they're unauthorized
+
+====================================================
+
+To get the currently authenticated user in an ASP.NET Core Web API, you use the User property 
+provided by the base ControllerBase class.
+
+// Get user's name (or username)
+var name = User.Identity.Name;
+
+// Get user ID (usually from ClaimTypes.NameIdentifier)
+var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+// Get email
+var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+// Get custom claim
+var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+Where do these claims come from?
+If you're using JWT authentication, these claims are typically included in the token.
+
+Example JWT payload:
+{
+  "sub": "123456",
+  "email": "user@example.com",
+  "name": "JohnDoe",
+  "role": "Admin"
+}
+
+What happens if you don’t use [Authorize]?
+Even without [Authorize], the User property is still populated if the request has a 
+valid authentication token or cookie.
+
+✅ So if:
+The request has a valid JWT token in the Authorization header
+
+❗ But if the token/cookie is missing or invalid:
+User.Identity.IsAuthenticated will be false
+User will still exist, but with no claims
+No exception is thrown — it’s just treated like an anonymous use

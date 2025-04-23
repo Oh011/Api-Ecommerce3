@@ -10,3 +10,7 @@ C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debu
 C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.pdb
 C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\ref\Domain.dll
 C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.sourcelink.json
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.csproj.AssemblyReference.cache
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\bin\Debug\net8.0\Shared.dll
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\bin\Debug\net8.0\Shared.pdb
+C:\omar\BackEnd\C#.net backend\C#\Asp.Net Apis\Coding\E-Commerce\Domain\obj\Debug\net8.0\Domain.csproj.Up2Date

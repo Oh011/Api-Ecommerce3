@@ -28,7 +28,11 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\omar\\BackEnd\\C#.net backend\\C#\\Asp.Net Apis\\Coding\\E-Commerce\\Shared\\Shared.csproj": {
+                "projectPath": "C:\\omar\\BackEnd\\C#.net backend\\C#\\Asp.Net Apis\\Coding\\E-Commerce\\Shared\\Shared.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -45,6 +49,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.15, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -182,6 +192,10 @@
             "AutoMapper": {
               "target": "Package",
               "version": "[14.0.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.15, )"
             },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",

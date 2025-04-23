@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using Domain.Entities.OrderEntities;
+using System.Reflection;
 
 namespace Persistence.Data
 {
@@ -6,7 +7,7 @@ namespace Persistence.Data
     {
 
 
-        public ApplicationDbContext(DbContextOptions options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
@@ -39,6 +40,14 @@ namespace Persistence.Data
 
 
         public DbSet<ProductType> ProductTypes { get; set; }
+
+
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderItem> Items { get; set; }
+
+
+        public DbSet<DeliveryMethod> DeliveryMethods { get; set; }
 
 
 

@@ -1,21 +1,15 @@
-using Domain.Contracts;
-using E_Commerce.Factories;
-using E_Commerce.Middlewares;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence.Data;
-using Persistence.Data.DataSeeding;
-using Persistence.Repositories;
-using Services;
-using Services.Abstractions;
+using E_Commerce.Extensions;
 
 
 namespace E_Commerce
 {
+
     public class Program
     {
         public static async Task Main(string[] args)
         {
+
+
             //-----------------------------------------------------------
             var builder = WebApplication.CreateBuilder(args);
 
@@ -39,74 +33,33 @@ namespace E_Commerce
 
 
 
-            builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
-
-
-            //AddApplicationPart() adds additional assemblies that contain controllers. 
-            //--> adds controllers in another assemblies 
-
-            //Presentation.AssemblyReference is just a placeholder or a marker class in the Presentation project.
-            //The.Assembly property accesses the assembly that contains this class. This is useful when the 
-            //controllers are in another project, and you want to reference that project in your Program.cs 
-            //to ensure the controllers are discovered.
+            //Presentation Services:
 
 
 
+            builder.Services.AddPresentationServices();
 
 
-
-            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-
-            //------------------------------------------------------------------
-
-            //The ApiBehaviorOptions class allows you to configure default behaviors for API controllers
-
-            //behavior of model validation and response generation when the model state is invalid
-
-            builder.Services.Configure<ApiBehaviorOptions>(
-
-                //Func ==> IActionResult
-                Options => Options.InvalidModelStateResponseFactory = ApiResponseFactory.CustomValidationsResponse
-
-            );
-
-            // changes the default behavior of how ASP.NET Core handles invalid model state 
 
 
             //------------------------------------------------------------------------
 
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
-            builder.Services.AddScoped<IServiceManager, ServiceManager>();
-            builder.Services.AddAutoMapper(typeof(Services.Mapping.ProductProfile));
+            //Cores Services:
 
 
-            //-----------------------------------------------------------------------
-
-            //AddEndpointsApiExplorer(): Helps generate API endpoint metadata.
-
-            //AddSwaggerGen(): Adds Swagger(OpenAPI) documentation generation for API endpoints.
-
-
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            //---------------------------------------------------------------
+            builder.Services.AddCoreServices(builder.Configuration);
 
 
 
-            builder.Services.AddDbContext<ApplicationDbContext>(Options =>
-            {
+
+            //Infrastructure Services
 
 
 
-                //Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"));
-                Options.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings")["DefaultConnectionString"]);
 
-
-                //ConfigurationManager implements both IConfiguration and IConfigurationManager.
-            });
+            builder.Services.AddInfrastructureServices(builder.Configuration);
 
 
             //-------------------------------------------------------------------------
@@ -116,10 +69,8 @@ namespace E_Commerce
             var app = builder.Build();
 
 
-            app.UseMiddleware<GlobalErrorHandlingMiddleware>(); // This will call InvokeAsync() in GlobalExceptionMiddleware
-            //ASP.NET Core framework itself calls the InvokeAsync() method for every middleware in the pipeline.
-
-            await InitializeDbAsync(app);
+            app.UseCustomMiddleware();
+            await app.SeedDbAsync();
 
             app.UseCors("AllowAll");
 
@@ -137,11 +88,14 @@ namespace E_Commerce
 
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles();
+
+            //Security Middlewares
+
             app.UseAuthentication();
 
             app.UseAuthorization();
 
-            app.UseStaticFiles();
 
 
             //Maps API controller routes, so API endpoints can handle incoming HTTP requests.
@@ -149,23 +103,20 @@ namespace E_Commerce
 
             app.Run();
 
-            //This method InitializeDbAsync is a helper function that initializes the database
-            async Task InitializeDbAsync(WebApplication app)
-            {
 
-
-                using var scope = app.Services.CreateScope();
-
-                //This allows retrieving services like IDbInitializer that are registered in dependency injection (DI).
-
-                var DbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-
-                //Gets an instance of IDbInitializer
-
-                await DbInitializer.InitializeAsync();
-
-
-            }
         }
     }
 }
+
+
+//AddAuthentication(...)  Configures how authentication should work	:
+//-->It does:
+//Registers the authentication service in the dependency injection container.
+//Specifies what kind of authentication to use (like JWT Bearer).
+//Sets default schemes, and configures JWT options (like validation parameters, secret key)
+
+//UseAuthentication()	Actually activates authentication middleware:
+//It does:
+//Tells ASP.NET Core to look for and validate tokens in incoming requests.
+//Sets the current User based on the token's claims.
+//-->Without this, even if everything is configured, requests will not be authenticated!
